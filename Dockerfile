@@ -33,6 +33,11 @@ WORKDIR /app
 RUN rm -rf /app/frontend
 RUN bun install
 
+# Patch @ai-sdk/openai: force systemMessageMode to "system" for non-OpenAI providers
+# The SDK defaults to "developer" role for unknown model IDs, which DeepSeek doesn't support
+RUN sed -i 's/const systemMessageMode = isReasoningModel ? "developer" : "system"/const systemMessageMode = "system"/' \
+    /app/node_modules/@ai-sdk/openai/dist/index.mjs
+
 # Final stage for app image
 FROM base
 
