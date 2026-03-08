@@ -17,6 +17,7 @@ if (ai_provider == "groq") {
   });
 } else {
   aiClient = createOpenAI({
+    compatibility: "compatible",
     apiKey: process.env.OPENAI_API_KEY,
     baseURL: openai_base_url,
   });
