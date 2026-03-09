@@ -1,7 +1,9 @@
 import { createGroq } from "@ai-sdk/groq";
 import { createOpenAI } from "@ai-sdk/openai";
 
-type AIProvider = ReturnType<typeof createGroq> | ReturnType<typeof createOpenAI>;
+type AIProvider =
+  | ReturnType<typeof createGroq>
+  | ReturnType<typeof createOpenAI>;
 let aiProvider: AIProvider;
 
 const EMBEDDING_MODEL = "text-embedding-3-small";
@@ -24,12 +26,15 @@ if (ai_provider == "groq") {
       try {
         const body = JSON.parse(init.body);
         if (Array.isArray(body.messages)) {
-          body.messages = body.messages.map((m: any) =>
-            m.role === "developer" ? { ...m, role: "system" } : m
+          body.messages = body.messages.map(
+            (m: { role: string; [key: string]: unknown }) =>
+              m.role === "developer" ? { ...m, role: "system" } : m,
           );
           init = { ...init, body: JSON.stringify(body) };
         }
-      } catch {}
+      } catch {
+        // JSON parse failed — send the request body as-is
+      }
     }
     return fetch(url, init);
   };
